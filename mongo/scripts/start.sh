@@ -1,0 +1,2 @@
+# Start mongo daemon
+mongod

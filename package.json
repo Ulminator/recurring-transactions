@@ -1,0 +1,21 @@
+{
+  "name": "transaction-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fast-csv": "^2.4.1",
+    "mongoose": "^5.2.15",
+    "zeromq": "^4.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4"
+  }
+}
