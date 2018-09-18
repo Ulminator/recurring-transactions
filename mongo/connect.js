@@ -2,20 +2,24 @@ const
   mongoose = require('mongoose'),
   { DB_URL } = require('../constants');
 
-module.exports = () => {
+module.exports = (cb) => {
 
-  mongoose.connect(DB_URL);
-
-  mongoose.connection.on('connected', () => {
-    console.log(`Mongoose default connection is open to ${DB_URL}`);
+  mongoose.connect(DB_URL, {
+    useNewUrlParser: true,
   });
 
-  mongoose.connection.on('error', (err) => {
-    console.log(`Mongoose Error: ${err}`);
+  mongoose.connection.on('connected', () => {
+    return cb();
   });
 
   mongoose.connection.on('disconnected', () => {
-    console.log('Mongoose default connection is disconnected');
+    console.log('Disconnected from mongo instance.');
+    process.exit(0);
+  });
+
+  mongoose.connection.on('error', (err) => {
+    console.log(err);
+    process.exit(0);
   });
 
   process.on('SIGINT', () => {
