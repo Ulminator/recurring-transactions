@@ -32,6 +32,12 @@ csv
   })
   .on('end', () => {
     console.log('Sending upsert data.');
+    // setInterval(() => {
+    //   requester.send(JSON.stringify({
+    //     task: UPSERT_USER_TRANSACTIONS,
+    //     transactions
+    //   }));
+    // }, 2000)
     requester.send(JSON.stringify({
       task: UPSERT_USER_TRANSACTIONS,
       transactions
