@@ -1,6 +1,7 @@
 const
   zmq = require('zeromq'),
   replier = zmq.socket('rep'),
+  mathjs = require('mathjs');
   mongoConnect = require('./mongo/connect'),
   Transaction = require('./mongo/models/transaction'),
   { UPSERT_USER_TRANSACTIONS,
@@ -26,6 +27,7 @@ function upsertTransactions(transactions, cb) {
 function getUserTransactionsAndBucketize(user_id, cb) {
   Transaction.aggregate([
     { $match: { user_id } },
+    { $sort:  { "date": -1 } }, 
     { $bucket: {
       groupBy: "$amount",
       boundaries: [-5000, 0, 30, 100, 250, 500, 1000, 5000],
@@ -74,9 +76,45 @@ mongoConnect(() => {
           getUserTransactionsAndBucketize(user_id, (err, docs) => {
             if (err) console.log(err);
             else {
-              console.log(docs);
+              docs.forEach(doc => {
+                console.log("\n" + doc.entity);
+                let goodstuff = [];
+                  doc.buckets.forEach(bucket => {
+                    // console.log(bucket.bin);
+                    if (bucket.transactions.length === 1) { return; }
+                    
+                    let daysPassed = [];
+                    for (let x = 0; x < bucket.transactions.length; x++) {
+                      if (x !== bucket.transactions.length - 1) {
+                        const days = ((bucket.transactions[x].date - bucket.transactions[x+1].date)/(1000*60*60*24));
+                        daysPassed.push(days)
+                      }
+                    }
+                    const mean = mathjs.mean(daysPassed);
+                    // console.log(mathjs.std(daysPassed));
+
+                    if (mean >= 5.5 && mean <= 8.5) {
+                      console.log('weekly sub of size: ' + daysPassed.length+1)
+                    }
+                    else if (mean >= 11.5 && mean <= 16.5) {
+                      console.log('every other week sub of size: ' + daysPassed.length+1);
+
+                    }
+                    else if (mean >= 28 && mean <= 33) {
+                      console.log('monthly sub of size: ' + daysPassed.length+1);
+
+                    }
+                    else if (mean >= 360 && mean <= 370) {
+                      console.log('yearly sub of size: ' + daysPassed.length+1);
+
+                    }
+                    else {
+                      console.log('NOT RECURRING WITH MEAN: ' + mean);
+                    }
+                  });
+              });
             }
-          })
+          });
 
           let recurring_trans = [];
   
