@@ -19,8 +19,13 @@ const
 
 requester.on('message', (data) => {
   let request = JSON.parse(data);
+  console.log(request)
   console.log(`Number of recurring transactions: ${request.recurring_trans.length}`);
 });
+
+requester.on('error', (err) => {
+  console.log(err);
+})
 
 requester.connect(TCP_ADDRESS);
 
