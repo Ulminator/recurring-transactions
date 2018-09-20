@@ -49,6 +49,7 @@ function getUserTransactionsAndBucketize(user_id, cb) {
       _id: { entity: "$entity" },
       buckets: { "$push": "$$ROOT" }
     }},
+    { $sort: { "_id": 1 } },
     { $project: {
       _id: 0,
       entity: "$_id.entity",
@@ -76,43 +77,98 @@ mongoConnect(() => {
           getUserTransactionsAndBucketize(user_id, (err, docs) => {
             if (err) console.log(err);
             else {
+              const ahh = {
+                recurring_trans: [
+                  {
+                    name: "in alphabetical order",
+                    user_id: "1",
+                    next_amt: "",
+                    next_date: "",
+                    transactions: [{},{},{}]
+                  }
+                ]
+              };
+              const output = { recurring_trans: [] };
               docs.forEach(doc => {
                 console.log("\n" + doc.entity);
-                let goodstuff = [];
                   doc.buckets.forEach(bucket => {
-                    // console.log(bucket.bin);
+
                     if (bucket.transactions.length === 1) { return; }
                     
-                    let daysPassed = [];
+                    let
+                      daysPassed = [];
+                      amounts = [];
                     for (let x = 0; x < bucket.transactions.length; x++) {
+                      amounts.push(bucket.transactions[x].amount);
                       if (x !== bucket.transactions.length - 1) {
                         const days = ((bucket.transactions[x].date - bucket.transactions[x+1].date)/(1000*60*60*24));
                         daysPassed.push(days)
                       }
                     }
-                    const mean = mathjs.mean(daysPassed);
-                    // console.log(mathjs.std(daysPassed));
-
-                    if (mean >= 5.5 && mean <= 8.5) {
+                    const meanDays = mathjs.mean(daysPassed);
+                    const meanAmounts = mathjs.mean(amounts);
+                    console.log(typeof bucket.transactions[0].date)
+                    if (meanDays >= 5.5 && meanDays <= 8.5) {
                       console.log('weekly sub of size: ' + daysPassed.length+1)
+
+                      const next_date = new Date(bucket.transactions[0].date);
+                      next_date.setDate(next_date.getDate() + 7)
+                      output.recurring_trans.push({
+                        name: bucket.transactions[0].name,
+                        user_id,
+                        next_amt: Math.round(meanAmounts * 100)/100,
+                        next_date,
+                        transactions: bucket.transactions
+                      });
                     }
-                    else if (mean >= 11.5 && mean <= 16.5) {
+                    else if (meanDays >= 11.5 && meanDays <= 16.5) {
                       console.log('every other week sub of size: ' + daysPassed.length+1);
 
+                      const next_date = new Date(bucket.transactions[0].date);
+                      next_date.setDate(next_date.getDate() + 14)
+                      output.recurring_trans.push({
+                        name: bucket.transactions[0].name,
+                        user_id,
+                        next_amt: Math.round(meanAmounts * 100)/100,
+                        next_date,
+                        transactions: bucket.transactions
+                      });
                     }
-                    else if (mean >= 28 && mean <= 33) {
+                    else if (meanDays >= 28 && meanDays <= 33) {
                       console.log('monthly sub of size: ' + daysPassed.length+1);
 
+                      const next_date = new Date(bucket.transactions[0].date);
+                      next_date.setDate(next_date.getDate() + 31)
+                      output.recurring_trans.push({
+                        name: bucket.transactions[0].name,
+                        user_id,
+                        next_amt: Math.round(meanAmounts * 100)/100,
+                        next_date,
+                        transactions: bucket.transactions
+                      });
+
                     }
-                    else if (mean >= 360 && mean <= 370) {
+                    else if (meanDays >= 360 && meanDays <= 370) {
                       console.log('yearly sub of size: ' + daysPassed.length+1);
+
+                      const next_date = new Date(bucket.transactions[0].date);
+                      next_date.setDate(next_date.getDate() + 365)
+                      output.recurring_trans.push({
+                        name: bucket.transactions[0].name,
+                        user_id,
+                        next_amt: Math.round(meanAmounts * 100)/100,
+                        next_date,
+                        transactions: bucket.transactions
+                      });
 
                     }
                     else {
-                      console.log('NOT RECURRING WITH MEAN: ' + mean);
+                      console.log('NOT RECURRING WITH MEAN: ' + meanDays);
                     }
                   });
               });
+              console.log(output);
+              // console.log(output.recurring_trans[0].transactions)
             }
           });
 
