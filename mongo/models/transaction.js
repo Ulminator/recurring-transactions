@@ -26,7 +26,7 @@ const transactionSchema = new Schema({
     type: Date,
     required: true,
   },
-  company: {
+  entity: {
     type: String,
     required: true,
   },
@@ -36,10 +36,10 @@ const transactionSchema = new Schema({
 });
 
 // up in the air
-transactionSchema.index({ user_id: 1, company: 1, amount: -1 });  // to find specific user/company transactions with amounts in decending order
+transactionSchema.index({ user_id: 1, entity: 1, amount: -1 });  // to find specific user/company transactions with amounts in decending order
 
 // 100% need
-transactionSchema.index({ user_id: 1 }, { unique: true });  // for finding transactions by user
+transactionSchema.index({ user_id: 1 });  // for finding transactions by user
 transactionSchema.index({ trans_id: 1, user_id: 1}, { unique: true });  // for the upsert transaction (makes unique combination of fields)
 
 module.exports = mongoose.model('Transaction', transactionSchema);
