@@ -1,15 +1,19 @@
 const
   zmq = require('zeromq'),
-  replier = zmq.socket('rep'),
   mongoConnect = require('./mongo/connect'),
 
-  { upsertUserTransactions,
+  {
+    upsertUserTransactions,
     getUserRecurringTransactions
   } = require('./mongo/queries'),
 
-  { UPSERT_USER_TRANSACTIONS,
+  { 
+    UPSERT_USER_TRANSACTIONS,
     GET_RECURRING_TRANSACTIONS,
-    TCP_ADDRESS } = require('./constants');
+    TCP_ADDRESS
+  } = require('./constants'),
+
+  replier = zmq.socket('rep');
 
 // look into: what happens to the data if it processes but there is a timeout (no response sent back in time)?
 mongoConnect(() => {
@@ -32,7 +36,7 @@ mongoConnect(() => {
         }
       });
     } else if (request.task === GET_RECURRING_TRANSACTIONS) {
-      // const { user_id } = transactions[0];
+      const { user_id } = request;
       getUserRecurringTransactions(user_id, (err, recurring_trans) => {
         if (err) console.log(err);           
         replier.send(JSON.stringify({

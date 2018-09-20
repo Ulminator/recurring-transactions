@@ -19,7 +19,6 @@ const
 
 requester.on('message', (data) => {
   let request = JSON.parse(data);
-  console.log(request)
   console.log(`Number of recurring transactions: ${request.recurring_trans.length}`);
 });
 
@@ -29,22 +28,43 @@ requester.on('error', (err) => {
 
 requester.connect(TCP_ADDRESS);
 
-let transactions = [];
-csv
-  .fromPath(DATA_PATH, { headers: true })
-  .on('data', (data) => {
-    transactions.push(data);
-  })
-  .on('end', () => {
-    console.log('Sending upsert data.');
-    // setInterval(() => {
-    //   requester.send(JSON.stringify({
-    //     task: UPSERT_USER_TRANSACTIONS,
-    //     transactions
-    //   }));
-    // }, 2000)
+if (process.argv[2] === 'upsert') {
+  let transactions = [];
+  csv
+    .fromPath(DATA_PATH, { headers: true })
+    .on('data', (data) => {
+      transactions.push(data);
+    })
+    .on('end', () => {
+      if (process.argv[3]) {
+        setInterval(() => {
+          requester.send(JSON.stringify({
+            task: UPSERT_USER_TRANSACTIONS,
+            transactions
+          }));
+        }, process.argv[3])
+      } else {
+        requester.send(JSON.stringify({
+          task: UPSERT_USER_TRANSACTIONS,
+          transactions
+        }));
+      }
+    });
+}
+else if (process.argv[2] === 'get') {
+  if (process.argv[3]) {
+    setInterval(() => {
+      requester.send(JSON.stringify({
+        task: GET_RECURRING_TRANSACTIONS,
+        user_id: '1'
+      }));
+    }, process.argv[3])
+  } else {
     requester.send(JSON.stringify({
-      task: UPSERT_USER_TRANSACTIONS,
-      transactions
+      task: GET_RECURRING_TRANSACTIONS,
+      user_id: '1'
     }));
-  });
+  }
+}
+
+
