@@ -2,22 +2,16 @@ const
   mathjs = require('mathjs'),
   Transaction = require('./models/transaction');
 
-function updateRecurringTrans(recurring_trans, user_id, transactions, amounts, category) {
-  const { name } = transactions;
-  const meanAmounts = mathjs.mean(amounts);
+function updateRecurringTrans(recurring_trans, user_id, transactions, amounts, recurringCategory) {
+  const { name, date } = transactions[0];
 
-  const next_date = new Date(transactions[0].date);
-  next_date.setDate(next_date.getDate() + category)
+  const next_amt = Math.round(mathjs.mean(amounts) * 100)/100;
 
-  recurring_trans.push({
-    name,
-    user_id,
-    next_amt: Math.round(meanAmounts * 100)/100,
-    next_date,
-    transactions
-  });
+  const next_date = new Date(date);
+  next_date.setDate(next_date.getDate() + recurringCategory);
+
+  recurring_trans.push({ name, user_id, next_amt, next_date, transactions });
 }
-
 
 function identifyRecurringTransactions(user_id, docs) {
   const recurring_trans = [];
@@ -41,15 +35,14 @@ function identifyRecurringTransactions(user_id, docs) {
       }
 
       const meanDays = mathjs.mean(daysPassed);
+      let recurringCategory = null;
 
-      if (meanDays >= 5.5 && meanDays <= 8.5) { updateRecurringTrans(recurring_trans, user_id, transactions, amounts, 7); }
-      
-      else if (meanDays >= 11.5 && meanDays <= 16.5) { updateRecurringTrans(recurring_trans, user_id, transactions, amounts, 14); }
-      
-      else if (meanDays >= 28 && meanDays <= 33) { updateRecurringTrans(recurring_trans, user_id, transactions, amounts, 31); }
-      
-      else if (meanDays >= 360 && meanDays <= 370) { updateRecurringTrans(recurring_trans, user_id, transactions, amounts, 365); }
-      
+      if      (meanDays >= 5.5 && meanDays <= 8.5)   { recurringCategory = 7; }
+      else if (meanDays >= 11.5 && meanDays <= 16.5) { recurringCategory = 14; }
+      else if (meanDays >= 28 && meanDays <= 33)     { recurringCategory = 31; }
+      else if (meanDays >= 360 && meanDays <= 370)   { recurringCategory = 365; }
+
+      if (recurringCategory !== null) { updateRecurringTrans(recurring_trans, user_id, transactions, amounts, recurringCategory); }
       else { console.log('NOT RECURRING WITH MEAN: ' + meanDays); }
 
     });
