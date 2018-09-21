@@ -24,9 +24,15 @@ module.exports = (cb) => {
   });
 
   process.on('SIGINT', () => {
-    mongoose.connection.close(() => {
-      console.log('Mongoose default connection is disconnected due to application termination');
-      process.exit(0);
-    });
+    mongoose.connection.db.dropDatabase(() => {
+      mongoose.connection.close(() => {
+        console.log('Mongoose default connection is disconnected due to application termination');
+        process.exit(0);
+      });
+    })
+    // mongoose.connection.close(() => {
+    //   console.log('Mongoose default connection is disconnected due to application termination');
+    //   process.exit(0);
+    // });
   });
 };

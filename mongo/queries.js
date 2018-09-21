@@ -6,11 +6,8 @@ function upsertUserTransactions(transactions, cb) {
   let count = 0;
   transactions.forEach(data => {
     const query = { trans_id: data.trans_id, user_id: data.user_id };
-    data.entity = data.name.replace(/\d/g, '').trim().toUpperCase();
-    // ([20]{2}[1-9]{2}[01]\d[0-3]\d| 
+    data.entity = data.name.split(' ').map(split => split.replace(/^((?=.*\d)(?=.*[A-Z])[A-Z\d]{6,}|[\d]{6,})$/, '')).join(' ').trim().toUpperCase();
 
-    // REGEX OF DATE -> NOW I NEED REFERENCE NUMBERS
-    // ([0-9]{6}|[A-Z0-9]{6})
     Transaction.findOneAndUpdate(query, data, { runValidators: true, upsert: true }, (err) => {
       if (err) return cb(err);
       if (++count === transactions.length) return cb();

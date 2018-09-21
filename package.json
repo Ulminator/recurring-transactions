@@ -8,17 +8,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Ulminator",
   "license": "ISC",
   "dependencies": {
-    "compute-iqr": "^1.1.0",
     "fast-csv": "^2.4.1",
     "mathjs": "^5.1.2",
     "mongoose": "^5.2.15",
-    "stats-lite": "^2.2.0",
     "zeromq": "^4.6.0"
   },
-  "devDependencies": {
-    "nodemon": "^1.18.4"
-  }
 }
