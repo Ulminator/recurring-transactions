@@ -10,7 +10,7 @@ const transactionSchema = new Schema({
     trim: true,
   },
   user_id: {
-    type: String, //{ type: mongoose.Schema.Types.ObjectId, ref: 'users' } reference user schema?
+    type: String,
     required: true,
     trim: true,
   },
@@ -32,14 +32,10 @@ const transactionSchema = new Schema({
   },
   is_recurring: {
     type: String
-  }
+  },
 });
 
-// up in the air
-transactionSchema.index({ user_id: 1, entity: 1, amount: -1 });  // to find specific user/company transactions with amounts in decending order
-
-// 100% need
-transactionSchema.index({ user_id: 1 });  // for finding transactions by user
-transactionSchema.index({ trans_id: 1, user_id: 1}, { unique: true });  // for the upsert transaction (makes unique combination of fields)
+transactionSchema.index({ user_id: 1 });
+transactionSchema.index({ trans_id: 1, user_id: 1}, { unique: true });
 
 module.exports = mongoose.model('Transaction', transactionSchema);

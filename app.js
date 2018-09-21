@@ -15,14 +15,13 @@ const
 
   replier = zmq.socket('rep');
 
-// look into: what happens to the data if it processes but there is a timeout (no response sent back in time)?
 mongoConnect(() => {
 
   replier.on('message', (data) => {
     const request = JSON.parse(data);
-    const { transactions } = request;
-  
+
     if (request.task === UPSERT_USER_TRANSACTIONS) {
+      const { transactions } = request;
       upsertUserTransactions(transactions, (err) => {
         if (err) console.log(err);
         else {

@@ -21,7 +21,8 @@ function upsertUserTransactions(transactions, cb) {
 function getUserRecurringTransactions(user_id, cb) {
   Transaction.aggregate([
     { $match: { user_id } },
-    { $sort:  { "date": -1 } }, 
+    { $sort:  { "date": -1 } },
+    { $project: { _id: 0, __v: 0 }},
     { $bucket: {
       groupBy: "$amount",
       boundaries: [-5000, 0, 30, 100, 250, 500, 1000, 5000],
