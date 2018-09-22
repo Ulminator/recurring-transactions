@@ -10,15 +10,20 @@ const
 
 requester.on('message', (data) => {
   let request = JSON.parse(data);
-  console.log(request);
-  console.log(`Number of recurring transactions: ${request.recurring_trans.length}`);
+  if (request.err) {
+    console.log(`ERROR: ${request.err}`);
+  } else {
+    // console.log(request.recurring_trans);
+    console.log(`Number of recurring transactions: ${request.recurring_trans.length}`);
+  }
 });
 
-requester.on('error', (err) => {
-  console.log(err);
-})
-
-requester.connect(TCP_ADDRESS);
+requester.connect(TCP_ADDRESS, (err) => {
+  if (err) {
+    console.log(`Failed to connect to socket: ${err.message}`);
+    process.exit(0);
+  }
+});
 
 if (process.argv[2] === 'upsert') {
   let transactions = [];
@@ -58,3 +63,8 @@ else if (process.argv[2] === 'get') {
     }));
   }
 }
+
+process.on('SIGINT', () => {
+  requester.close();
+  process.exit();
+});

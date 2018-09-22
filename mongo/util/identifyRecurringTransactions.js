@@ -40,9 +40,9 @@ function identifyRecurringTransactions(user_id, docs) {
       else if (meanDays >= 360 && meanDays <= 370)   { recurringCategory = 365; }
       
       // REMOVE THESE
-      console.log(doc.entity);
-      if (recurringCategory !== null) { transactions.forEach(transaction => console.log(transaction.trans_id)) }
-      else { console.log("NOT RECURRING: " + doc.entity) }
+      // console.log(doc.entity);
+      // if (recurringCategory !== null) { transactions.forEach(transaction => console.log(transaction.trans_id)) }
+      // else { console.log("NOT RECURRING: " + doc.entity) }
       
       if (recurringCategory !== null) { updateRecurringTrans(recurring_trans, user_id, transactions, amounts, recurringCategory); }
 

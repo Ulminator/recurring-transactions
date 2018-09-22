@@ -30,9 +30,6 @@ const transactionSchema = new Schema({
     type: String,
     required: true,
   },
-  is_recurring: {
-    type: String
-  },
 });
 
 transactionSchema.index({ user_id: 1 });
