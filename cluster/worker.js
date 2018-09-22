@@ -32,38 +32,36 @@ mongoConnect(() => {
 
     if (request.task === UPSERT_USER_TRANSACTIONS) {
       const { transactions } = request;
-      upsertUserTransactions(transactions, (err) => {
-        if (err) {
-          process.send({ err, pid, timestamp: Date.now() });
-          if (timer) {
-            replier.send(JSON.stringify({ err: 'UPSERT TRANSACTIONS' }));
-            clearTimeout(timer);
-          }
-        }
-        else if (timer) {
-          const { user_id } = transactions[0];
-          getUserRecurringTransactions(user_id, (err, recurring_trans) => {
-            if (err) process.send({ pid, err, timestamp: Date.now() });
+        upsertUserTransactions(transactions, (err) => {
+          if (err) {
+            process.send({ err, pid, timestamp: Date.now() });
             if (timer) {
-              if (err){
-                replier.send(JSON.stringify({ err: 'GET RECURRING TRANSACTIONS' }));
-              } else {
-                replier.send(JSON.stringify({ recurring_trans }));
-                process.send({ pid, timestamp: Date.now() });
-              }
+              replier.send(JSON.stringify({ err: 'UPSERT TRANSACTIONS' }));
               clearTimeout(timer);
             }
-          });          
-        }
-      });
+          }
+          else if (timer) {
+            const { user_id } = transactions[0];
+            getUserRecurringTransactions(user_id, (err, recurring_trans) => {
+              if (err) process.send({ pid, err, timestamp: Date.now() });
+              if (timer) {
+                if (err) replier.send(JSON.stringify({ err: 'GET RECURRING TRANSACTIONS' }));
+                else {
+                  replier.send(JSON.stringify({ recurring_trans }));
+                  process.send({ pid, timestamp: Date.now() });
+                }
+                clearTimeout(timer);
+              }
+            });          
+          }
+        });
     } else if (request.task === GET_RECURRING_TRANSACTIONS) {
       const { user_id } = request;
       getUserRecurringTransactions(user_id, (err, recurring_trans) => {
         if (err) process.send({ pid, err, timestamp: Date.now() });
         if (timer) {
-          if (err){
-            replier.send(JSON.stringify({ err: 'GET RECURRING TRANSACTIONS' }));
-          } else {
+          if (err) replier.send(JSON.stringify({ err: 'GET RECURRING TRANSACTIONS' }));
+          else {
             replier.send(JSON.stringify({ recurring_trans }));
             process.send({ pid, timestamp: Date.now() });
           }
@@ -82,7 +80,6 @@ mongoConnect(() => {
       process.send({ pid, err: `Failed to bind to socket: ${err.message}`, timestamp: Date.now() });
       process.exit(0);
     }
-    process.send({ msg: 'Listening for zmq requesters...' })
   });
 
   process.on('SIGINT', () => {

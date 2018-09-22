@@ -13,8 +13,8 @@ requester.on('message', (data) => {
   if (request.err) {
     console.log(`ERROR: ${request.err}`);
   } else {
-    // console.log(request.recurring_trans);
-    console.log(`Number of recurring transactions: ${request.recurring_trans.length}`);
+    console.log(JSON.stringify(request, null, 2));
+    // console.log(`Number of recurring transactions: ${request.recurring_trans.length}`);
   }
 });
 

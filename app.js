@@ -43,11 +43,8 @@ mongoConnect(() => {
             getUserRecurringTransactions(user_id, (err, recurring_trans) => {
               if (err) console.log(err);
               if (timer) {
-                if (err) {
-                  replier.send(JSON.stringify({ err: 'GET RECURRING TRANSACTIONS' }));
-                } else {
-                  replier.send(JSON.stringify({ recurring_trans }));
-                }
+                if (err) replier.send(JSON.stringify({ err: 'GET RECURRING TRANSACTIONS' }));
+                else     replier.send(JSON.stringify({ recurring_trans }));
                 clearTimeout(timer);
               }
             });          
@@ -58,11 +55,8 @@ mongoConnect(() => {
       getUserRecurringTransactions(user_id, (err, recurring_trans) => {
         if (err) console.log(err);
         if (timer) {
-          if (err) {
-            replier.send(JSON.stringify({ err: 'GET RECURRING TRANSACTIONS' }));
-          } else {
-            replier.send(JSON.stringify({ recurring_trans }));
-          }
+          if (err) replier.send(JSON.stringify({ err: 'GET RECURRING TRANSACTIONS' }));
+          else     replier.send(JSON.stringify({ recurring_trans }));
           clearTimeout(timer);
         }
       });

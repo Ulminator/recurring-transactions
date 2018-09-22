@@ -47,4 +47,4 @@ if (cluster.isMaster) {
     process.exit();
   });
 
-} else { require('./worker-app.js'); }
+} else { require('./worker.js'); }
